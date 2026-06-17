@@ -15,7 +15,7 @@ import java.util.UUID;
 public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecutor {
 
     private final HashSet<UUID> pendingLogin = new HashSet<>();
-    private final AuthManager authManager = new AuthManager(); // ភ្ជាប់ទៅ AuthManager
+    private final AuthManager authManager = new AuthManager();
 
     @Override
     public void onEnable() {
@@ -28,11 +28,10 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        pendingLogin.add(player.getUniqueId());
         if (authManager.isRegistered(player.getUniqueId())) {
-            pendingLogin.add(player.getUniqueId());
             player.sendMessage("§eសូមវាយ /login <password> ដើម្បីចូល!");
         } else {
-            pendingLogin.add(player.getUniqueId());
             player.sendMessage("§eសូមវាយ /register <password> ដើម្បីចុះឈ្មោះ!");
         }
     }
@@ -63,7 +62,6 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         return false;
     }
 
-    // ផ្នែក Events (Move, Chat, Inventory) នៅដដែលដូចកូដមុន...
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         if (pendingLogin.contains(event.getPlayer().getUniqueId())) event.setCancelled(true);
