@@ -6,20 +6,21 @@ import java.util.UUID;
 
 public class AuthManager {
 
-    // នេះជាកន្លែងទុក Password បណ្ដោះអាសន្ន (ក្នុងដំណាក់កាលបន្ទាប់យើងនឹងប្រើ Database)
     private final HashMap<UUID, String> registeredPasswords = new HashMap<>();
 
-    // សម្រាប់ចុះឈ្មោះ Password ថ្មី
     public void register(UUID uuid, String password) {
-        registeredPasswords.put(uuid, password);
+        // Hash password មុនរក្សាទុក
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt(12));
+        registeredPasswords.put(uuid, hashedPassword);
     }
 
-    // សម្រាប់ពិនិត្យមើល Password ថាតើត្រឹមត្រូវដែរឬទេ
     public boolean checkPassword(UUID uuid, String password) {
-        return registeredPasswords.containsKey(uuid) && registeredPasswords.get(uuid).equals(password);
+        if (!registeredPasswords.containsKey(uuid)) return false;
+        String hashedPassword = registeredPasswords.get(uuid);
+        // ផ្ទៀងផ្ទាត់ជាមួយ BCrypt
+        return BCrypt.checkpw(password, hashedPassword);
     }
 
-    // ពិនិត្យថាតើអ្នកលេងបានចុះឈ្មោះហើយឬនៅ
     public boolean isRegistered(UUID uuid) {
         return registeredPasswords.containsKey(uuid);
     }
