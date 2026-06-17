@@ -1,5 +1,6 @@
 package me.loyalty.loyaltylogin;
 
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.HashMap;
 import java.util.UUID;
 
