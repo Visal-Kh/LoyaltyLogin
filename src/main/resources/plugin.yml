@@ -1,1 +1,13 @@
-
+name: LoyaltyLogin
+version: '1.0'
+main: me.loyalty.loyaltylogin.LoyaltyLogin
+api-version: '1.21'
+author: LoyaltyMC
+description: ប្រព័ន្ធការពារសុវត្ថិភាពសម្រាប់អ្នកលេង។
+commands:
+  register:
+    description: ចុះឈ្មោះលេខកូដសម្ងាត់សម្រាប់ Login
+    usage: /register <password>
+  login:
+    description: ចូលប្រើប្រាស់អាខោន
+    usage: /login <password>
