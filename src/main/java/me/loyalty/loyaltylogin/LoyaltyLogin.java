@@ -3,8 +3,7 @@ package me.loyalty.loyaltylogin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.*;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecutor {
-
     private final HashSet<UUID> pendingLogin = new HashSet<>();
     private final AuthManager authManager = new AuthManager();
 
@@ -22,7 +20,6 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         getServer().getPluginManager().registerEvents(this, this);
         getCommand("register").setExecutor(this);
         getCommand("login").setExecutor(this);
-        getLogger().info("LoyaltyLogin បានដំណើរការ!");
     }
 
     @EventHandler
@@ -30,9 +27,9 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         Player player = event.getPlayer();
         pendingLogin.add(player.getUniqueId());
         if (authManager.isRegistered(player.getUniqueId())) {
-            player.sendMessage("§eសូមវាយ /login <password> ដើម្បីចូល!");
+            player.sendMessage("សូមវាយ /login <password>");
         } else {
-            player.sendMessage("§eសូមវាយ /register <password> ដើម្បីចុះឈ្មោះ!");
+            player.sendMessage("សូមវាយ /register <password>");
         }
     }
 
@@ -40,40 +37,20 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player)) return true;
         Player player = (Player) sender;
+        if (args.length == 0) return false;
 
         if (cmd.getName().equalsIgnoreCase("register")) {
-            if (args.length == 0) return false;
             authManager.register(player.getUniqueId(), args[0]);
             pendingLogin.remove(player.getUniqueId());
-            player.sendMessage("§aចុះឈ្មោះជោគជ័យ!");
-            return true;
-        }
-
-        if (cmd.getName().equalsIgnoreCase("login")) {
-            if (args.length == 0) return false;
+            player.sendMessage("ចុះឈ្មោះជោគជ័យ!");
+        } else if (cmd.getName().equalsIgnoreCase("login")) {
             if (authManager.checkPassword(player.getUniqueId(), args[0])) {
                 pendingLogin.remove(player.getUniqueId());
-                player.sendMessage("§aLogin ជោគជ័យ!");
+                player.sendMessage("Login ជោគជ័យ!");
             } else {
-                player.sendMessage("§cPassword មិនត្រឹមត្រូវ!");
+                player.sendMessage("លេខសម្ងាត់ខុស!");
             }
-            return true;
         }
-        return false;
-    }
-
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        if (pendingLogin.contains(event.getPlayer().getUniqueId())) event.setCancelled(true);
-    }
-    
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event) {
-        if (pendingLogin.contains(event.getPlayer().getUniqueId())) event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) {
-        if (pendingLogin.contains(event.getWhoClicked().getUniqueId())) event.setCancelled(true);
+        return true;
     }
 }
