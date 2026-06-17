@@ -1,15 +1,12 @@
 package me.loyalty.loyaltylogin;
 
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.Listener;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.event.*;
+import org.bukkit.event.player.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecutor {
     private final HashSet<UUID> pendingLogin = new HashSet<>();
@@ -20,16 +17,32 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         getServer().getPluginManager().registerEvents(this, this);
         getCommand("register").setExecutor(this);
         getCommand("login").setExecutor(this);
+        getLogger().info("§a[LoyaltyLogin] បានដំណើរការជោគជ័យ!");
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        pendingLogin.add(player.getUniqueId());
-        if (authManager.isRegistered(player.getUniqueId())) {
-            player.sendMessage("សូមវាយ /login <password>");
+        if (player.getName().equals("Visal-Kh")) { // ដាក់ឈ្មោះ Account Premium របស់បងនៅទីនេះ
+            player.sendMessage("§bស្វាគមន៍ Premium Player! បងត្រូវបាន Auto-Login រួចរាល់។");
         } else {
-            player.sendMessage("សូមវាយ /register <password>");
+            pendingLogin.add(player.getUniqueId());
+            player.sendMessage("§eសូមវាយ /register <password> ដើម្បីចុះឈ្មោះ។");
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        if (pendingLogin.contains(event.getPlayer().getUniqueId())) {
+            event.setTo(event.getFrom()); // បិទការដើរ
+        }
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        if (pendingLogin.contains(event.getPlayer().getUniqueId())) {
+            event.setCancelled(true);
+            event.getPlayer().sendMessage("§cសូម Login ជាមុនសិន!");
         }
     }
 
@@ -42,13 +55,13 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         if (cmd.getName().equalsIgnoreCase("register")) {
             authManager.register(player.getUniqueId(), args[0]);
             pendingLogin.remove(player.getUniqueId());
-            player.sendMessage("ចុះឈ្មោះជោគជ័យ!");
+            player.sendMessage("§aចុះឈ្មោះជោគជ័យ!");
         } else if (cmd.getName().equalsIgnoreCase("login")) {
             if (authManager.checkPassword(player.getUniqueId(), args[0])) {
                 pendingLogin.remove(player.getUniqueId());
-                player.sendMessage("Login ជោគជ័យ!");
+                player.sendMessage("§aLogin ជោគជ័យ!");
             } else {
-                player.sendMessage("លេខសម្ងាត់ខុស!");
+                player.sendMessage("§cលេខសម្ងាត់ខុស!");
             }
         }
         return true;
