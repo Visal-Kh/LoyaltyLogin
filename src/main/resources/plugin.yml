@@ -1,5 +1,5 @@
 name: LoyaltyLogin
-version: '1.0'
+version: '1.1'
 main: me.loyalty.loyaltylogin.LoyaltyLogin
 api-version: '1.21'
 commands:
@@ -7,3 +7,4 @@ commands:
     usage: /register <password>
   login:
     usage: /login <password>
+    
