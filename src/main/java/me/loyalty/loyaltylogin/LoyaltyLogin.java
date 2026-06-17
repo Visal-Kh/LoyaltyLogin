@@ -20,10 +20,15 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
         getLogger().info("§a[LoyaltyLogin] បានដំណើរការជោគជ័យ!");
     }
 
+    // បន្ថែមបញ្ជីឈ្មោះ Premium Player របស់អ្នកនៅទីនេះ
+    private final List<String> premiumPlayers = Arrays.asList("Visal-Kh", "Player2", "FriendName");
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (player.getName().equals("Visal-Kh")) { // ដាក់ឈ្មោះ Account Premium របស់បងនៅទីនេះ
+        
+        // ពិនិត្យមើលថាតើឈ្មោះអ្នកលេងមានក្នុងបញ្ជី Premium ឬអត់
+        if (premiumPlayers.contains(player.getName())) {
             player.sendMessage("§bស្វាគមន៍ Premium Player! បងត្រូវបាន Auto-Login រួចរាល់។");
         } else {
             pendingLogin.add(player.getUniqueId());
