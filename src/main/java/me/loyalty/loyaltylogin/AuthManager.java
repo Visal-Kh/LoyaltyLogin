@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class AuthManager {
-    // ត្រូវមាន Map នេះដើម្បីរក្សាទុក Password
     private final HashMap<UUID, String> registeredPasswords = new HashMap<>();
 
     public void register(UUID uuid, String password) {
@@ -15,8 +14,7 @@ public class AuthManager {
 
     public boolean checkPassword(UUID uuid, String password) {
         if (!registeredPasswords.containsKey(uuid)) return false;
-        String hashedPassword = registeredPasswords.get(uuid);
-        return BCrypt.checkpw(password, hashedPassword);
+        return BCrypt.checkpw(password, registeredPasswords.get(uuid));
     }
 
     public boolean isRegistered(UUID uuid) {
