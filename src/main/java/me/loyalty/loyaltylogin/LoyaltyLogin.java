@@ -25,16 +25,25 @@ public class LoyaltyLogin extends JavaPlugin implements Listener, CommandExecuto
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        
-        // ពិនិត្យមើលថាតើឈ្មោះអ្នកលេងមានក្នុងបញ្ជី Premium ឬអត់
-        if (premiumPlayers.contains(player.getName())) {
+    Player player = event.getPlayer();
+
+    // ពិនិត្យមើលថាតើ Player នោះចូលតាមរយៈគណនី Premium ឬអត់
+    // ក្នុង Minecraft, ប្រសិនបើ Server បើក mode (online-mode=true) វានឹងស្គាល់ Premium ដោយស្វ័យប្រវត្តិ
+    // ប៉ុន្តែបើបងប្រើ Server Cracked បងត្រូវប្រើវិធីនេះ៖
+    
+    if (player.getAddress().getAddress().isLoopbackAddress() || player.getName().length() > 0) {
+        // កូដសម្រាប់ពិនិត្យ Profile របស់ Mojang
+        if (player.getUniqueId().version() == 4) { 
+            // UUID version 4 ជាធម្មតាគឺជា UUID ដែលបង្កើតពីគណនី Premium
             player.sendMessage("§bស្វាគមន៍ Premium Player! បងត្រូវបាន Auto-Login រួចរាល់។");
-        } else {
-            pendingLogin.add(player.getUniqueId());
-            player.sendMessage("§eសូមវាយ /register <password> ដើម្បីចុះឈ្មោះ។");
+            return; // ចេញពីកូដនេះ មិនបាច់ Lock ទេ
         }
     }
+    
+    // បើមិនមែន Premium ទេ ទើប Lock ពួកគេ
+    pendingLogin.add(player.getUniqueId());
+    player.sendMessage("§eសូមវាយ /register <password> ដើម្បីចុះឈ្មោះ។");
+}
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
